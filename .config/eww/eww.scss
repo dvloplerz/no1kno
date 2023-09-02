@@ -1,0 +1,172 @@
+$base: rgba(#191724, 1);
+$surface: rgba(#1f1d2e, 1);
+$overlay: rgba(#26233a, 1);
+$muted: rgba(#6e6a86, 1);
+$subtle: rgba(#908caa, 1);
+$text: rgba(#e0def4, 1);
+$love: rgba(#eb6f92, 1);
+$gold: rgba(#f6c177, 1);
+$rose: rgba(#ebbcba, 1);
+$pine: rgba(#31748f, 1);
+$foam: rgba(#9ccfd8, 1);
+$iris: rgba(#c4a7e7, 1);
+$hi_low: rgba(#21202e, 1);
+$hi_med: rgba(#403d52, 1);
+$hi_high: rgba(#524f67, 1);
+$green: rgba(#a6e3a1, 1);
+$crust: rgba(#11111b, 1);
+
+* {
+    all: unset; //Unsets everything so you can style everything from scratch
+}
+
+.bar {
+    margin: .2rem 0;
+}
+
+tooltip.background {
+    border: 1px solid $rose;
+    border-radius: 6px;
+    font-size: 18;
+    background: $hi_low;
+    color: $text;
+}
+
+tooltip label {
+    margin: 3px;
+}
+
+$col: $green;
+$hov_col: $love;
+$hov_bg_col: $surface;
+
+
+.workspace {
+    color: initial;
+    border-width: initial;
+    border-style: initial;
+    border-color: initial;
+    border-radius: initial;
+    background-color: transparent;
+    margin: 0;
+    padding: 0;
+    font-size: 10pt;
+    margin: 0 .2rem;
+
+    .runner {
+        border: .03rem solid $green;
+    }
+
+    .btn {
+        border-width: .02rem;
+        border-style: solid;
+        border-color: $love;
+        border-radius: .5rem;
+        &:hover {
+            color: $hov_col;
+            animation: tbac .8s;
+            background-color: $hov_bg_col;
+            border-width: 1px;
+            border-color: $love;
+        }
+    }
+}
+
+.btn {
+    color: rgba($text, .9);
+    padding: 2px 1.3rem;
+    border-width: unset;
+    border-style: initial;
+    border-color: initial;
+    border-radius: initial;
+}
+
+.items {
+    color: rgba($text, .9);
+    padding: 2px 1.3rem;
+    border-width: .02rem;
+    border-style: solid;
+    border-color: initial;
+    border-radius: .5rem;
+}
+
+
+.datetime {
+    margin-right: .2rem;
+    padding-right: .6rem;
+    font-size: 15pt;
+    background: rgba($green, .6);
+    .clock {
+        color: $love;
+        background: $base;
+        margin: 0;
+        padding: 0 0;
+        padding-left: .8rem;
+        padding-right: .4rem;
+        &:hover {
+            background: $gold;
+        }
+    }
+    .arrow {
+        padding: 0;
+        margin: 0;
+        border-top: 12px solid transparent;
+        border-left: 9px solid $base;
+        border-bottom: 12px solid transparent;
+    }
+    .arrow-tail {
+        padding-left: .5rem;
+        padding-right: .3rem;
+        border-top: 12px solid $base;
+        border-left: 9px solid transparent;
+        border-bottom: 12px solid $base;
+    }
+    .calendar {
+        color: $rose;
+        background: $base;
+        padding: 0;
+        padding-right: .8rem;
+        padding-left: .1rem;
+    }
+}
+
+.blink {
+    animation: blinking 1s ease-in-out infinite;
+    color: $pine;
+}
+
+@keyframes blinking {
+0% {
+    opacity: 1;
+}
+25% {
+    opacity: 0.3;
+}
+50% {
+    opacity: 0;
+}
+75% {
+    opacity: 0.3;
+}
+100% {
+    opacity: 1;
+}
+}
+
+@keyframes tbac {
+    0% {
+    background: rgba($color: $hov_bg_col, $alpha: .2);
+}
+    25% {
+    background: rgba($color: $hov_bg_col, $alpha: .4);
+}
+    50% {
+    background: rgba($color: $hov_bg_col, $alpha: .6);
+}
+    75% {
+    background: rgba($color: $hov_bg_col, $alpha: .8);
+}
+    100% {
+    background: rgba($color: $hov_bg_col, $alpha: 1);
+}
+}
