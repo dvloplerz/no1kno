@@ -1,0 +1,429 @@
+
+		{
+			"VonHeikemen/lsp-zero.nvim",
+						event = {  "BufReadPre", "BufNewFile" },
+			branch = "dev-v3",
+			dependencies = {
+				{
+
+					-- LSP Support
+					{ "williamboman/mason.nvim" }, -- Optional
+					{ "williamboman/mason-lspconfig.nvim" }, -- Optional
+					{
+						"hrsh7th/cmp-nvim-lsp", -- Required
+						event = "InsertEnter",
+						dependencies = {
+
+							{ "hrsh7th/cmp-buffer" }, -- Required
+							{ "hrsh7th/cmp-path" }, -- Required
+							{ "saadparwaiz1/cmp_luasnip" }, -- Required
+							{ url = "https://github.com/hrsh7th/cmp-nvim-lua.git" }, -- Required
+						},
+					},
+					{ "hrsh7th/cmp-buffer" }, -- Required
+					{ "hrsh7th/cmp-path" }, -- Required
+					{ "saadparwaiz1/cmp_luasnip" }, -- Required
+					{ url = "https://github.com/hrsh7th/cmp-nvim-lua.git" }, -- Required
+					{
+						"b0o/schemastore.nvim",
+					},
+
+					-- Autocompletion
+					{
+						"mtoohey31/cmp-fish",
+						event = {
+							"BufRead *.fish",
+						},
+					},
+					{
+					{ "hrsh7th/cmp-buffer" }, -- Required
+					{ "hrsh7th/cmp-path" }, -- Required
+					{ "saadparwaiz1/cmp_luasnip" }, -- Required
+					{ url = "https://github.com/hrsh7th/cmp-nvim-lua.git" }, -- Required
+						"L3MON4D3/LuaSnip",
+						version = "2.*",
+						build = "make install_jsregexp",
+						dependencies = {
+							{
+								"rafamadriz/friendly-snippets",
+							},
+						},
+						opts = {
+							history = true,
+							updateevents = { "TextChanged", "TextChangedI" },
+						},
+					}, -- Required
+					{
+						"hrsh7th/cmp-nvim-lsp-signature-help",
+					},
+					{
+						"simrat39/rust-tools.nvim",
+						event = { "BufRead *.rs" },
+						ft = { "rust", "rs" },
+						dependencies = {
+							--{ 'rust-lang/rust.vim' },
+							{ "nvim-lua/plenary.nvim" },
+							{ "mfussenegger/nvim-dap" },
+							{
+								"saecki/crates.nvim",
+								dependencies = {
+									"nvim-lua/plenary.nvim",
+								},
+								event = {
+									"BufRead Cargo.toml",
+								},
+							},
+						},
+					},
+				},
+				config = function()
+					local lsp = require("lsp-zero").preset({
+						float_border = "single",
+						set_signcolumn = true,
+						extend_lspconfig = true,
+					})
+                    print("zero start")
+
+					local lspconfig = require("lspconfig")
+					local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+
+					lsp.on_attach(function(client, bufnr)
+						lsp.default_keymaps({ buffer = bufnr })
+						vim.lsp.handlers["textDocument/publishDiagnostics"] =
+							vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+								virtual_text = true,
+								signs = true,
+								underline = false,
+								update_in_insert = true,
+							})
+
+						if client.supports_method("textDocument/inlayHint") then
+							vim.lsp.inlay_hint(bufnr, true)
+						else
+							vim.lsp.inlay_hint(bufnr, false)
+						end
+					end)
+
+					lsp.set_server_config({
+						on_init = function(client)
+							--client.server_capabilities.semanticTokenProvider = nil
+						end,
+						single_file_support = true,
+						capabilities = {
+							textDocument = {
+								callHierarchy = {
+									resolveProvider = true,
+								},
+								completion = {
+									completionItem = {
+										commitCharactersSupport = true,
+										deprecatedSupport = true,
+										documentationFormat = { "markdown", "plaintext" },
+										preselectSupport = true,
+										snippetSupport = true,
+									},
+									contextSupport = true,
+									dynamicRegistration = true,
+								},
+								diagnostic = {
+									dynamicRegistration = true,
+								},
+								documentHighlight = {
+									dynamicRegistration = true,
+								},
+								semanTokens = {},
+							},
+						},
+					})
+
+					lsp.set_sign_icons({
+						--error = '✘',
+						--warn = '▲',
+						error = "X",
+						warn = "",
+						hint = "⚑",
+						info = "»",
+					})
+
+					lsp.omnifunc.setup({
+						tabcomplete = false,
+						use_fallback = true,
+						update_on_delete = true,
+						preselect = false,
+					})
+
+					--lsp.setup_servers({ 'lua_ls', 'rust_analyzer', 'jsonls', 'taplo' })
+
+					require("mason").setup({})
+					require("mason-lspconfig").setup({
+						ensure_installed = { "lua_ls", "rust_analyzer", "jsonls", "taplo", "rome" },
+						handlers = {
+							lsp.default_setup,
+							rome = function()
+								require("lspconfig").rome.setup({})
+							end,
+							ruff_lsp = function()
+								require("lspconfig").ruff_lsp.setup({
+									ft = { "python", "py" },
+									init_options = {
+										settings = {
+											args = {},
+										},
+									},
+								})
+							end,
+							lua_ls = function()
+								require("lspconfig").lua_ls.setup(lsp.nvim_lua_ls({
+									settings = {
+										Lua = {},
+									},
+								}))
+							end,
+							rust_analyzer = function()
+								local rt = require("rust-tools")
+								rt.setup({
+									tools = {
+										inlay_hints = {
+											auto = false,
+										},
+										hover_actions = {
+											border = "single",
+										},
+									},
+									server = {
+										cmd = { "rustup", "run", "stable", "rust-analyzer" },
+										on_attach = function(_, bufnr)
+											vim.keymap.set("n", "<Space>", "<Noq>", { noremap = true })
+											vim.keymap.set(
+												"n",
+												"K",
+												require("rust-tools").hover_actions.hover_actions,
+												{ buffer = bufnr }
+											)
+											vim.keymap.set(
+												"n",
+												"<leader>h",
+												require("rust-tools").code_action_group.code_action_group,
+												{ buffer = bufnr }
+											)
+										end,
+										single_file_support = true,
+										capabilities = lsp_capabilities,
+										settings = {
+											["rust-analyzer"] = {
+												imports = {
+													granularity = {
+														group = "preserve",
+													},
+													prefix = "self",
+												},
+												diagnostics = {
+													enable = true,
+													experimental = {
+														enable = true,
+													},
+													previewRustcOutput = true,
+												},
+												completion = {
+													callable = {
+														snippets = "fill_arguments",
+													},
+												},
+												check = {
+													invocationLocation = "root",
+												},
+												cargo = {},
+												inlayHints = {
+													bindingModeHints = { enable = false },
+													chainingHints = { enable = false },
+													closingBraceHints = {
+														enable = true,
+														minLines = 25,
+													},
+													closureCaptureHints = { enable = false },
+													closureReturnTypeHints = { enable = "never" },
+													closureStyle = "impl_fn",
+													expressionAdjustmentHints = { enable = "never" },
+													lifetimeElisionHints = {
+														enable = "never",
+														useParameterNames = true,
+													},
+													parameterHints = { enable = true },
+													reborrowHints = { enable = "never" },
+													renderColons = true,
+													typeHints = {
+														enable = true,
+														hideClosureInitialization = false,
+														hideNamedConstructor = false,
+													},
+												},
+												hover = {
+													actions = {
+														references = {
+															enable = true,
+														},
+														run = {
+															enable = true,
+														},
+													},
+												},
+												lens = {
+													enable = true,
+													debug = {
+														enable = true,
+													},
+													forceCustomCommands = true,
+													implementations = {
+														enable = true,
+													},
+													location = "above_name",
+													references = {
+														adt = {
+															enable = true,
+														},
+														enumVariant = {
+															enable = true,
+														},
+														method = {
+															enable = true,
+														},
+														trait = {
+															enable = true,
+														},
+													},
+													run = {
+														enable = true,
+													},
+												},
+												lru = {
+													capacity = 256,
+												},
+												typing = {
+													autoClosingAngleBrackets = { enable = true },
+													continueCommentsOnNewline = false,
+												},
+												worspace = {
+													symbol = {
+														search = { scope = "all_symbols" },
+													},
+												},
+												restartServerOnConfigChange = true,
+												procMacro = {
+													enable = true,
+													attributes = {
+														enable = true,
+													},
+												},
+												rustfmt = {
+													rangeFormatting = {
+														enable = true,
+													},
+												},
+												semanticHighlighting = {
+													doc = {
+														comment = {
+															inject = {
+																enable = true,
+															},
+														},
+													},
+													nonStandardTokens = false,
+													operator = {
+														enable = true,
+														specialization = {
+															enable = true,
+														},
+													},
+													punctuation = {
+														enable = true,
+														separate = {
+															macro = {
+																bang = true,
+															},
+														},
+														specialization = {
+															enable = true,
+														},
+													},
+													strings = {
+														enable = true,
+													},
+												},
+												signatureInfo = {
+													detail = "full",
+													documentation = {
+														enable = true,
+													},
+												},
+											},
+										},
+									},
+								})
+							end,
+							require("lspconfig").rome.setup({}),
+						},
+					})
+
+					require("lsp-zero").extend_cmp()
+					local cmp = require("cmp")
+					local cmp_action = require("lsp-zero").cmp_action()
+
+					require("luasnip.loaders.from_vscode").lazy_load()
+
+					cmp.setup({
+						completion = {
+							completeopt = "menu,menuone,noinsert",
+						},
+						formatting = {
+							fields = { "menu", "abbr", "kind" },
+							format = function(entry, item)
+								local menu_icon = {
+									nvim_lsp = "λ",
+									luasnip = "⋗",
+									buffer = "Ω",
+									path = "🖫",
+									nvim_lua = "Π",
+								}
+								item.menu = menu_icon[entry.source.name]
+								return item
+							end,
+						},
+						sources = {
+							{ name = "nvim_lsp" },
+                            { name = "luasnip" },
+							{ name = "nvim_lua" },
+                            {
+							{ name = "buffer" },
+							{ name = "path" },
+							{ name = "crates" },
+                        },
+						},
+						mapping = {
+							["<C-f>"] = cmp_action.luasnip_jump_forward(),
+							["<C-b>"] = cmp_action.luasnip_jump_backward(),
+							["<CR>"] = cmp.mapping.confirm({ select = false }),
+						},
+					})
+					--local border = "single"
+
+					vim.diagnostic.config({
+						float = { border = "single" },
+						virtual_text = true,
+						update_in_insert = false,
+						underline = false,
+						severity_sort = true,
+					})
+
+					--vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
+					--  vim.lsp.handlers.signature_help,
+					--  { border = border }
+					--)
+
+					--vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
+					--  vim.lsp.handlers.signature_help,
+					--  { border = border }
+					--)
+				end,
+			},
+		},
+
