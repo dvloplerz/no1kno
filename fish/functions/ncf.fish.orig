@@ -1,0 +1,11 @@
+function ncf
+   # printf "%s" /home/dvloplerz/dotfiles/config/nvim
+  set nvc $XDG_CONFIG_HOME/nvim/
+  argparse n/nvim -- $argv
+
+  if set -ql _flag_nvim
+    nvim $nvc
+	else
+		echo $nvc
+  end
+end

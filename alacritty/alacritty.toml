@@ -1,0 +1,89 @@
+#import = [ "~/.config/alacritty/catppuccin.toml"]
+import = ["~/.config/alacritty/themes/rose-pine.toml"]
+
+shell = { program = "nu" }
+
+live_config_reload = true
+ipc_socket = true
+
+[colors]
+draw_bold_text_with_bright_colors = true
+#transparent_background_colors = false
+#transparent_background_colors = true
+
+[cursor]
+unfocused_hollow = true
+
+blink_timeout = 0
+thickness = 0
+
+[cursor.style]
+blinking = "Always"
+shape = "Block"
+
+[env]
+TERM = "alacritty"
+
+[font]
+builtin_box_drawing = true
+offset = { x = 0, y = 0 }
+glyph_offset = { x = 0, y = 0 }
+size = 12
+
+
+[font.bold]
+family = "IosevkaTerm Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+#family = "Operator-Caska"
+family = "IosevkaTerm Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+#family = "Operator-Caska"
+family = "IosevkaTerm Nerd Font"
+style = "Bold Italic"
+
+[font.normal]
+family = "IosevkaTerm Nerd Font"
+style = "Regular"
+#style = "Medium"
+
+[mouse]
+hide_when_typing = true
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[selection]
+save_to_clipboard = true
+
+
+[window]
+decorations = "None"
+decorations_theme_variant = "Dark"
+dynamic_padding = true
+#dynamic_padding = false
+dynamic_title = false
+opacity = 0.95
+title = "Alacritty"
+resize_increments = false
+#resize_increments = true
+
+[window.class]
+general = "Alacritty"
+instance = "Alacritty"
+
+[window.dimensions]
+columns = 80
+lines = 24
+
+[window.padding]
+x = 0
+y = 0
+
+[window.position]
+x = 0
+y = 0
